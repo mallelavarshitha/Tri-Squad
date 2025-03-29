@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI Legal Expert</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: url('https://t3.ftcdn.net/jpg/07/23/17/58/360_F_723175824_5sqbzCFeT6lnq49gRGCKzYeyUeSbv1E3.jpg') no-repeat center center fixed;
+      background-size: cover;
+      animation: fadeInBody 2s ease-in;
+    }
+
+    @keyframes fadeInBody {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    nav {
+      background-color: #1f3c88;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 40px;
+      color: white;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    nav .logo {
+      display: flex;
+      align-items: center;
+    }
+
+    nav img {
+      height: 40px;
+      margin-right: 15px;
+    }
+
+    nav h1 {
+      font-size: 24px;
+      margin: 0;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 25px;
+      margin: 0;
+      padding: 0;
+    }
+
+    nav ul li a {
+      color: white;
+      text-decoration: none;
+      transition: opacity 0.3s ease;
+    }
+
+    nav ul li a:hover {
+      opacity: 0.7;
+    }
+
+    main {
+      max-width: 600px;
+      background: rgba(255, 255, 255, 0.95);
+      margin: 40px auto;
+      padding: 30px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      animation: fadeInMain 1.2s ease forwards;
+    }
+
+    @keyframes fadeInMain {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    input, select, textarea {
+      padding: 10px;
+      margin-top: 5px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      transition: box-shadow 0.3s ease;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      box-shadow: 0 0 5px rgba(31, 60, 136, 0.6);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    button {
+      margin-top: 25px;
+      padding: 12px;
+      font-size: 18px;
+      background: #1f3c88;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+    button:hover {
+      background: #142a66;
+      transform: scale(1.03);
+    }
+
+    #caseDetailsSection {
+      display: none;
+    }
+
+    .success-message {
+      color: green;
+      font-weight: bold;
+      margin-top: 15px;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: slideInSuccess 0.6s ease forwards;
+    }
+
+    @keyframes slideInSuccess {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media screen and (max-width: 640px) {
+      nav {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      nav ul {
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      main {
+        margin: 20px;
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="logo">
+      <img src="court.png" alt="Court Icon" />
+      <h1>AI Legal Expert</h1>
+    </div>
+    <ul>
+      <li><a href="#">Home</a></li>
+      <li><a href="#">About</a></li>
+      <li><a href="#">Contact</a></li>
+    </ul>
+  </nav>
+
+  <main id="userFormSection">
+    <form id="legalForm">
+      <label for="name">Name:</label>
+      <input type="text" id="name" name="name" required />
+
+      <label for="email">Email ID:</label>
+      <input type="email" id="email" name="email" required />
+
+      <label for="phone">Phone No:</label>
+      <input type="tel" id="phone" name="phone" required />
+
+      <label for="place">Place:</label>
+      <input type="text" id="place" name="place" required />
+
+      <label for="caseType">Type of Case:</label>
+      <select id="caseType" name="caseType" required>
+        <option value="">-- Select --</option>
+      </select>
+
+      <button type="submit">Next</button>
+    </form>
+  </main>
+
+  <main id="caseDetailsSection">
+    <form id="caseForm">
+      <label for="description">Case Situation:</label>
+      <textarea id="description" name="description" placeholder="Describe your case..." required></textarea>
+
+      <label for="documents">Upload Supporting Documents:</label>
+      <input type="file" id="documents" name="documents" multiple />
+
+      <button type="submit">Submit Case</button>
+      <p class="success-message" id="successMsg" style="display:none;">✅ Case submitted successfully!</p>
+    </form>
+  </main>
+  <script>
+    const caseTypes = {
+      "case_types": ["Criminal", "Civil", "Family", "Property", "Corporate", "Labor", "Consumer", "Tax"]
+    };
+
+    window.onload = () => {
+      const select = document.getElementById("caseType");
+      caseTypes.case_types.forEach(type => {
+        const option = document.createElement("option");
+        option.value = type.toLowerCase();
+        option.textContent = type;
+        select.appendChild(option);
+      });
+    };
+    document.getElementById("legalForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      document.getElementById("userFormSection").style.display = "none";
+      document.getElementById("caseDetailsSection").style.display = "block";
+    });
+    document.getElementById("caseForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const desc = document.getElementById("description").value.trim();
+      const files = document.getElementById("documents").files;
+
+      if (desc === "") {
+        alert("Please describe the case.");
+        return;
+      }
+
+      console.log("Case description:", desc);
+      console.log("Number of files uploaded:", files.length);
+
+      const msg = document.getElementById("successMsg");
+      msg.style.display = "block";
+      msg.style.animation = "slideInSuccess 0.6s ease forwards";
+    });
+  </script>
+</body>
+</html>
